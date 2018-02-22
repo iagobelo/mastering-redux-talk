@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
+import { connect } from 'react-redux';
 
 const styles = StyleSheet.create({
     container: {
@@ -20,27 +21,28 @@ const styles = StyleSheet.create({
     },
 });
 
-
 class UserInfo extends React.Component {
     static navigationOptions = {
         title: 'Usuário'
     };
 
     render() {
-        const { user } = this.props.navigation.state.params;
+        const { selected } = this.props;
 
         return (
             <View style={styles.cardContainer}>
                 <Image
-                    source={{ uri: user.avatar_url }}
+                    source={{ uri: selected.avatar_url }}
                     style={styles.userProfile}
                     resizeMode="contain"
                 />
 
-                <Text style={styles.text}>{user.login}</Text>
+                <Text style={styles.text}>{selected.login}</Text>
             </View>
         );
     }
 }
 
-export default UserInfo;
+const mapStateToProps = ({ user }) => ({ selected: user.selected });
+
+export default connect(mapStateToProps)(UserInfo);

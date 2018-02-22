@@ -1,8 +1,18 @@
 import React from 'react';
-import { View, Text, FlatList, StyleSheet, Image, Dimensions, TouchableOpacity } from 'react-native';
+import {
+    View,
+    Text,
+    FlatList,
+    StyleSheet,
+    Image,
+    Dimensions,
+    TouchableOpacity,
+} from 'react-native';
 import axios from 'axios';
+import { connect } from 'react-redux';
 
-const USERS_URL = 'https://api.github.com/users';
+import * as UserActions from '../actions/UserActions';
+
 const { width } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
@@ -29,23 +39,14 @@ class ListUsers extends React.Component {
         title: 'Lista Usuários'
     };
 
-    state = {
-        users: [],
-    };
-
     componentDidMount() {
-        this.getUsers();
-    }
-
-    getUsers = async () => {
-        const { data: users } = await axios.get(USERS_URL);
-        this.setState({ users });
+        this.props.getUsers();
     }
 
     renderItem = ({ item }) => (
         <TouchableOpacity
             style={styles.cardContainer}
-            onPress={() => this.props.navigation.navigate('UserInfo', { user: item })}
+            onPress={() => this.props.selectUser(item, this.props.navigation)}
         >
             <Image
                 source={{ uri: item.avatar_url }}
@@ -60,10 +61,12 @@ class ListUsers extends React.Component {
     keyExtractor = ({ id }) => id;
 
     render() {
+        const { users } = this.props;
+
         return (
             <View style={styles.container}>
                 <FlatList
-                    data={this.state.users}
+                    data={users}
                     renderItem={this.renderItem}
                     keyExtractor={this.keyExtractor}
                 />
@@ -72,4 +75,6 @@ class ListUsers extends React.Component {
     }
 }
 
-export default ListUsers;
+const mapStateToProps = ({ user }) => ({ users: user.users });
+
+export default connect(mapStateToProps, { ...UserActions })(ListUsers);
